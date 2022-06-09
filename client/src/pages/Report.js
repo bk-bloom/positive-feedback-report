@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import ReactLoading from "react-loading";
 import { getData } from "../api";
 import { RESULT } from "../db";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const COLORS = [
   "#CC2B69",
@@ -28,11 +30,11 @@ const Wrapper = styled.div`
   width: 60%;
   display: flex;
   flex-direction: column;
+  padding: 40px;
 `;
 
 const HeaderTopContainer = styled.div`
   display: flex;
-  margin-top: 20px;
 `;
 const HeaderTopBorder = styled.div`
   height: 10px;
@@ -142,12 +144,27 @@ const CommentSectionList = styled.div`
 
 const CommentSectionItem = styled.p``;
 
+const DownloadButton = styled.div`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  position: fixed;
+  bottom: 50px;
+  right: 50px;
+  cursor: pointer;
+`;
+
 function Report() {
   const [strengthWords, setStrengthWords] = useState([]);
   const [valueWords, setValueWords] = useState([]);
   const [appreciateComments, setAppreciateComments] = useState([]);
   const [expectComments, setExpectComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const printRef = useRef();
 
   const location = useLocation();
 
@@ -172,6 +189,22 @@ function Report() {
     // });
   }, []);
 
+  const handleDownloadPdf = async () => {
+    const element = printRef.current;
+    const canvas = await html2canvas(element, {
+      scale: 1,
+    });
+    const data = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF();
+    const imgProperties = pdf.getImageProperties(data);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+    pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save("print.pdf");
+  };
+
   return (
     <Container isLoading={isLoading}>
       {isLoading ? (
@@ -185,7 +218,7 @@ function Report() {
           <span>리포트 생성중...</span>
         </>
       ) : (
-        <Wrapper>
+        <Wrapper ref={printRef}>
           <HeaderTopContainer>
             {COLORS.map((color) => (
               <HeaderTopBorder bgColor={color} />
@@ -250,6 +283,7 @@ function Report() {
           </CommentContainer>
         </Wrapper>
       )}
+      <DownloadButton onClick={handleDownloadPdf}>PDF</DownloadButton>
     </Container>
   );
 }
