@@ -127,6 +127,7 @@ const CommentSectionTitle = styled.div`
   background-color: #ff812c;
   color: white;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 10px;
@@ -167,26 +168,31 @@ function Report() {
   const printRef = useRef();
 
   const location = useLocation();
-
+  console.log(location.state.name);
   useEffect(() => {
+
+    // Dummy Data
     const result = RESULT;
     setStrengthWords(result.strengthWords);
     setValueWords(result.valueWords);
     setAppreciateComments(result.appreciateComments);
     setExpectComments(result.expectComments);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 2000);
 
+    // API Data
     // getData(location.state.name).then((result) => {
     //   console.log(result);
     //   setStrengthWords(result.strengthWords);
     //   setValueWords(result.valueWords);
     //   setAppreciateComments(result.appreciateComments);
     //   setExpectComments(result.expectComments);
-    //   setIsLoading(false);
     // });
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
   }, []);
 
   const handleDownloadPdf = async () => {
@@ -261,7 +267,8 @@ function Report() {
           </SectionContainer>
           <CommentContainer>
             <CommentSection>
-              <CommentSectionTitle>감사와 응원을 보냅니다</CommentSectionTitle>
+              {/* <CommentSectionTitle>감사와<br />응원을<br />보냅니다</CommentSectionTitle> */}
+              <CommentSectionTitle><span>감사와</span><span>응원을</span><span>보냅니다</span></CommentSectionTitle>
               <CommentSectionList>
                 {appreciateComments.map((comment, index) => (
                   <CommentSectionItem key={index}>
@@ -271,7 +278,7 @@ function Report() {
               </CommentSectionList>
             </CommentSection>
             <CommentSection>
-              <CommentSectionTitle>앞으로 기대합니다</CommentSectionTitle>
+              <CommentSectionTitle><span>앞으로</span><span>기대합니다</span></CommentSectionTitle>
               <CommentSectionList>
                 {expectComments.map((comment, index) => (
                   <CommentSectionItem key={index}>
